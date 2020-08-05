@@ -1,0 +1,86 @@
+server:
+  port: 8080
+---
+
+spring:
+  profiles: default
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: order
+          destination: pizzamake
+          contentType: application/json
+        event-out:
+          destination: pizzamake
+          contentType: application/json
+
+feign:
+  order:
+    url: localhost:8081
+  make:
+    url: localhost:8082
+  complete:
+    url: localhost:8083
+  showStatus:
+    url: localhost:8084
+  hystrix:
+    enabled: true
+
+logging:
+  level:
+    org.hibernate.type: trace
+    org.springframework.cloud: debug
+server:
+  port: 8081
+---
+
+spring:
+  profiles: docker
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: my-kafka.kafka.svc.cluster.local:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: order
+          destination: pizzamake
+          contentType: application/json
+        event-out:
+          destination: pizzamake
+          contentType: application/json
+
+feign:
+  order:
+    url: order:8080
+  make:
+    url: make:8080
+  complete:
+    url: delivery:8080
+  showStatus:
+    url: orderView:8080
