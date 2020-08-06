@@ -16,7 +16,12 @@ spec:
     spec:
       containers:
         - name: order
-          image: username/order:latest
+          image: 052937454741.dkr.ecr.us-west-2.amazonaws.com/skccuser6-order:latest
+          resources:
+            requests:
+              cpu: "200m"
+            limits:
+              cpu: "500m"
           ports:
             - containerPort: 8080
           readinessProbe:
